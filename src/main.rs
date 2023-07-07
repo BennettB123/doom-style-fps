@@ -1,9 +1,8 @@
 use macroquad::prelude::*;
 
-const DEFAULT_FOV_QUALITY: f32 = 1.0;
+const SCREEN_CHUNKS_PER_FOV_DEGREE: f32 = 2.0;
 const MAX_VIEW_DISTANCE: f32 = 15.0;
-const MAX_VIEW_DISTANCE_WALL_HEIGHT: f32 = 20.0; // percentage of screen height that max distance
-                                                 // walls appear
+const MAX_VIEW_DISTANCE_WALL_HEIGHT: f32 = 20.0; // % of screen height that max dist walls appear
 const DISTANCE_STEP_INCREMENT: f32 = 0.1;
 
 #[macroquad::main(get_window_conf())]
@@ -43,36 +42,27 @@ fn draw_scene(state: &GameState) {
     let map = &state.map;
 
     // draw map from player's perspective
-    let half_fov = (player.fov / 2.0) as i32;
-    let fov_screen_width = screen_width() / player.fov;
-    for fov_offset in -half_fov..=half_fov {
-        let view_angle = player.direction + fov_offset as f32;
-        let dist_to_wall = distance_to_wall(&map, &player.location, view_angle);
-        if let Some(distance) = dist_to_wall {
-            let start_x: f32 = fov_screen_width * (fov_offset as f32 + half_fov as f32);
-            draw_fov_chunk(start_x, start_x + fov_screen_width, distance);
-        }
-    }
-}
-
-fn distance_to_wall(map: &Map, start_location: &Location, direction: f32) -> Option<f32> {
-    let mut distance = 0.0;
-    let mut curr_location = *start_location;
+    let half_fov = player.fov / 2.0;
+    let chunk_width = screen_width() / (player.fov * SCREEN_CHUNKS_PER_FOV_DEGREE);
+    let chunk_view_angle_increment = 1.0 / SCREEN_CHUNKS_PER_FOV_DEGREE;
+    let mut curr_chunk = 1;
+    let mut curr_chunk_view_angle = -half_fov;
 
     loop {
-        if distance >= MAX_VIEW_DISTANCE {
-            return None;
-        }
-        if map.is_wall(&curr_location) {
+        if curr_chunk_view_angle >= half_fov {
             break;
         }
 
-        distance += DISTANCE_STEP_INCREMENT;
-        curr_location.x += DISTANCE_STEP_INCREMENT * direction.to_radians().cos();
-        curr_location.y += DISTANCE_STEP_INCREMENT * direction.to_radians().sin();
+        let view_angle = player.direction + curr_chunk_view_angle;
+        let dist_to_wall = map.distance_to_wall(&player.location, view_angle);
+        let chunk_start_x: f32 = chunk_width * curr_chunk as f32;
+        draw_fov_chunk(chunk_start_x, chunk_start_x + chunk_width, dist_to_wall);
+
+        curr_chunk_view_angle += chunk_view_angle_increment;
+        curr_chunk += 1;
     }
-    Some(distance)
 }
+
 
 fn draw_fov_chunk(start_x: f32, end_x: f32, dist_to_wall: f32) {
     let x = start_x;
@@ -201,6 +191,23 @@ pub struct Map {
 }
 
 impl Map {
+    fn distance_to_wall(&self, start_location: &Location, direction: f32) -> f32 {
+        let mut distance = 0.0;
+        let mut curr_location = *start_location;
+
+        loop {
+            if self.is_wall(&curr_location) {
+                break;
+            }
+
+            distance += DISTANCE_STEP_INCREMENT;
+            curr_location.x += DISTANCE_STEP_INCREMENT * direction.to_radians().cos();
+            curr_location.y += DISTANCE_STEP_INCREMENT * direction.to_radians().sin();
+        }
+        distance
+    }
+
+
     fn is_wall(&self, location: &Location) -> bool {
         match self.grid[location.x as usize][location.y as usize] {
             MapEntity::Wall => true,
