@@ -1,11 +1,10 @@
 use macroquad::prelude::*;
 
-const SCREEN_CHUNKS_PER_FOV_DEGREE: f32 = 2.0;
-const MAX_VIEW_DISTANCE: f32 = 15.0; // maximum distance at which objects are visible
-const MAX_VIEW_DISTANCE_WALL_HEIGHT: f32 = 20.0; // % of screen height that max dist walls appear
-const DISTANCE_STEP_INCREMENT: f32 = 0.1;
+mod screen;
 
-#[macroquad::main(get_window_conf())]
+const GAME_NAME: &str = "Doom Style FPS";
+
+#[macroquad::main(get_window_configuration())]
 async fn main() {
     let map = map_builder::load_map_1();
     let player = Player::new(map.player_start);
@@ -13,18 +12,18 @@ async fn main() {
 
     // Enter main game loop
     while !exit_button_pressed() {
-        clear_background(BLACK);
-
         capture_user_input(&mut game_state);
-        draw_scene(&game_state);
+
+        screen::clear_screen();
+        screen::draw_screen(&game_state);
 
         next_frame().await
     }
 }
 
-fn get_window_conf() -> Conf {
+pub fn get_window_configuration() -> Conf {
     Conf {
-        window_title: "doom-style-fps".to_owned(),
+        window_title: GAME_NAME.to_owned(),
         high_dpi: true,
         fullscreen: false,
         window_width: 2500,
@@ -35,53 +34,6 @@ fn get_window_conf() -> Conf {
 
 fn exit_button_pressed() -> bool {
     is_key_down(KeyCode::Escape) || is_key_down(KeyCode::Q)
-}
-
-fn draw_scene(state: &GameState) {
-    let player = &state.player;
-    let map = &state.map;
-
-    // draw map from player's perspective
-    let half_fov = player.fov / 2.0;
-    let chunk_width = screen_width() / (player.fov * SCREEN_CHUNKS_PER_FOV_DEGREE);
-    let chunk_view_angle_increment = 1.0 / SCREEN_CHUNKS_PER_FOV_DEGREE;
-    let mut curr_chunk = 1;
-    let mut curr_chunk_view_angle = -half_fov;
-
-    loop {
-        if curr_chunk_view_angle >= half_fov {
-            break;
-        }
-
-        let view_angle = player.direction + curr_chunk_view_angle;
-        let dist_to_wall = map.distance_to_wall(&player.location, view_angle);
-        let chunk_start_x: f32 = chunk_width * curr_chunk as f32;
-        draw_wall_chunk(chunk_start_x, chunk_start_x + chunk_width, dist_to_wall);
-
-        curr_chunk_view_angle += chunk_view_angle_increment;
-        curr_chunk += 1;
-    }
-}
-
-fn draw_wall_chunk(start_x: f32, end_x: f32, dist_to_wall: f32) {
-    const MAX_ALPHA: u8 = 200;
-    const MIN_ALPHA: u8 = 50;
-
-    let x = start_x;
-    let w = end_x - start_x;
-    let h = 20.0 * (MAX_VIEW_DISTANCE_WALL_HEIGHT * MAX_VIEW_DISTANCE / dist_to_wall); // TODO: fix
-    let y = (screen_height() / 2.0) - (h / 2.0);
-    let alpha: u8 = map_range(
-        dist_to_wall,
-        (MAX_VIEW_DISTANCE, 0.0),
-        (MIN_ALPHA as f32, MAX_ALPHA as f32),
-    ) as u8;
-
-    draw_rectangle(x, y, w, h, color_u8!(255, 255, 255, alpha));
-}
-
-fn map_range(input: f32, from_range: (f32, f32), to_range: (f32, f32)) -> f32 {
-    to_range.0 + (input - from_range.0) * (to_range.1 - to_range.0) / (from_range.1 - from_range.0)
 }
 
 fn capture_user_input(state: &mut GameState) {
@@ -202,6 +154,8 @@ pub struct Map {
 }
 
 impl Map {
+    const DISTANCE_INCREMENT: f32 = 0.1;
+
     fn distance_to_wall(&self, start_location: &Location, direction: f32) -> f32 {
         let mut distance = 0.0;
         let mut curr_location = *start_location;
@@ -211,9 +165,9 @@ impl Map {
                 break;
             }
 
-            distance += DISTANCE_STEP_INCREMENT;
-            curr_location.x += DISTANCE_STEP_INCREMENT * direction.to_radians().cos();
-            curr_location.y += DISTANCE_STEP_INCREMENT * direction.to_radians().sin();
+            distance += Map::DISTANCE_INCREMENT;
+            curr_location.x += Map::DISTANCE_INCREMENT * direction.to_radians().cos();
+            curr_location.y += Map::DISTANCE_INCREMENT * direction.to_radians().sin();
         }
         distance
     }
@@ -246,10 +200,12 @@ mod map_builder {
 #                      #
 #                      #
 #                      #
+#                      #
 #         ####         #
 #         #  #         #
 #         #  #         #
 #         ####         #
+#                      #
 #                      #
 #                      #
 #                      #
