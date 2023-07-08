@@ -1,7 +1,7 @@
 use macroquad::prelude::*;
 
 const SCREEN_CHUNKS_PER_FOV_DEGREE: f32 = 2.0;
-const MAX_VIEW_DISTANCE: f32 = 15.0;
+const MAX_VIEW_DISTANCE: f32 = 15.0; // maximum distance at which objects are visible
 const MAX_VIEW_DISTANCE_WALL_HEIGHT: f32 = 20.0; // % of screen height that max dist walls appear
 const DISTANCE_STEP_INCREMENT: f32 = 0.1;
 
@@ -56,21 +56,32 @@ fn draw_scene(state: &GameState) {
         let view_angle = player.direction + curr_chunk_view_angle;
         let dist_to_wall = map.distance_to_wall(&player.location, view_angle);
         let chunk_start_x: f32 = chunk_width * curr_chunk as f32;
-        draw_fov_chunk(chunk_start_x, chunk_start_x + chunk_width, dist_to_wall);
+        draw_wall_chunk(chunk_start_x, chunk_start_x + chunk_width, dist_to_wall);
 
         curr_chunk_view_angle += chunk_view_angle_increment;
         curr_chunk += 1;
     }
 }
 
+fn draw_wall_chunk(start_x: f32, end_x: f32, dist_to_wall: f32) {
+    const MAX_ALPHA: u8 = 200;
+    const MIN_ALPHA: u8 = 50;
 
-fn draw_fov_chunk(start_x: f32, end_x: f32, dist_to_wall: f32) {
     let x = start_x;
     let w = end_x - start_x;
     let h = 20.0 * (MAX_VIEW_DISTANCE_WALL_HEIGHT * MAX_VIEW_DISTANCE / dist_to_wall); // TODO: fix
     let y = (screen_height() / 2.0) - (h / 2.0);
-    let rgb = 255 - (255.0 * (dist_to_wall / MAX_VIEW_DISTANCE)) as u8;
-    draw_rectangle(x, y, w, h, color_u8!(rgb, rgb, rgb, rgb));
+    let alpha: u8 = map_range(
+        dist_to_wall,
+        (MAX_VIEW_DISTANCE, 0.0),
+        (MIN_ALPHA as f32, MAX_ALPHA as f32),
+    ) as u8;
+
+    draw_rectangle(x, y, w, h, color_u8!(255, 255, 255, alpha));
+}
+
+fn map_range(input: f32, from_range: (f32, f32), to_range: (f32, f32)) -> f32 {
+    to_range.0 + (input - from_range.0) * (to_range.1 - to_range.0) / (from_range.1 - from_range.0)
 }
 
 fn capture_user_input(state: &mut GameState) {
@@ -137,8 +148,8 @@ struct Player {
 }
 
 impl Player {
-    const MOVEMENT_SPEED: f32 = 0.1; // speed per second
-    const ROTATION_SPEED: f32 = 90.0; // angle rotation per second
+    const MOVEMENT_SPEED: f32 = 0.1; // speed per second. TODO
+    const ROTATION_SPEED: f32 = 90.0; // angle rotation per second. TODO
 
     fn new(location: Location) -> Self {
         Player {
@@ -207,7 +218,6 @@ impl Map {
         distance
     }
 
-
     fn is_wall(&self, location: &Location) -> bool {
         match self.grid[location.x as usize][location.y as usize] {
             MapEntity::Wall => true,
@@ -229,12 +239,22 @@ mod map_builder {
 "
 ########################
 #                      #
+# P                    #
 #                      #
 #                      #
-#  P      ####         #
+#                      #
+#                      #
+#                      #
+#                      #
+#         ####         #
 #         #  #         #
 #         #  #         #
 #         ####         #
+#                      #
+#                      #
+#                      #
+#                      #
+#                      #
 #                      #
 #                      #
 #                      #
