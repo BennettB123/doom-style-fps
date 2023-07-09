@@ -43,10 +43,11 @@ pub fn draw_screen(state: &GameState) {
     }
 }
 
+// TODO: fix this function
 fn draw_wall_chunk(start_x: f32, end_x: f32, dist_to_wall: f32) {
     let x = start_x;
     let w = end_x - start_x;
-    let h = 20.0 * (MAX_VIEW_DISTANCE_WALL_HEIGHT * MAX_VIEW_DISTANCE / dist_to_wall); // TODO: fix
+    let h = 20.0 * (MAX_VIEW_DISTANCE_WALL_HEIGHT * MAX_VIEW_DISTANCE / dist_to_wall); // TODO
     let y = (screen_height() / 2.0) - (h / 2.0);
     let alpha: u8 = map_range(
         dist_to_wall,
