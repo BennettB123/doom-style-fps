@@ -1,3 +1,5 @@
+use macroquad::time::get_frame_time;
+
 use super::Location;
 
 pub enum Direction {
@@ -10,31 +12,29 @@ pub enum Direction {
 #[derive(Debug)]
 pub struct Player {
     pub location: Location,
-    pub direction: f32, // direction player is facing in degrees (0 - 360)
-    pub fov: f32,       // field of view in degrees
+    pub direction: f32, // direction player is facing in degrees
 }
 
 impl Player {
-    const MOVEMENT_SPEED: f32 = 0.1; // speed per second. TODO
-    const ROTATION_SPEED: f32 = 90.0; // angle rotation per second. TODO
+    const MOVEMENT_SPEED: f32 = 5.0; // positions per second
+    const ROTATION_SPEED: f32 = 120.0; // degrees per second
 
     pub fn new(location: Location) -> Self {
         Player {
             location,
             direction: 0.0,
-            fov: 90.0,
         }
     }
 
     pub fn look_right(&mut self) {
-        self.direction += 2.0;
+        self.direction += get_frame_time() * Player::ROTATION_SPEED;
         if self.direction >= 360.0 {
             self.direction -= 360.0;
         }
     }
 
     pub fn look_left(&mut self) {
-        self.direction -= 2.0;
+        self.direction -= get_frame_time() * Player::ROTATION_SPEED;
         if self.direction <= 0.0 {
             self.direction += 360.0;
         }
@@ -49,9 +49,11 @@ impl Player {
             Direction::Right => move_angle += 90.0,
         }
 
+        let frame_time = get_frame_time();
+
         self.location
-            .move_x(Player::MOVEMENT_SPEED * move_angle.to_radians().cos());
+            .move_x(frame_time * Player::MOVEMENT_SPEED * move_angle.to_radians().cos());
         self.location
-            .move_y(Player::MOVEMENT_SPEED * move_angle.to_radians().sin());
+            .move_y(frame_time * Player::MOVEMENT_SPEED * move_angle.to_radians().sin());
     }
 }

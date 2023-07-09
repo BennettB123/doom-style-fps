@@ -3,9 +3,10 @@ use macroquad::prelude::*;
 use crate::GameState;
 
 const BACKGROUND_COLOR: Color = BLACK;
+const PLAYER_FOV: f32 = 90.0; // field of view in degrees
 const SCREEN_CHUNKS_PER_FOV_DEGREE: f32 = 2.0;
 const MAX_VIEW_DISTANCE: f32 = 15.0; // maximum distance at which objects are visible
-const MAX_VIEW_DISTANCE_WALL_HEIGHT: f32 = 20.0; // % of screen height that max dist walls appear
+const MAX_VIEW_DISTANCE_WALL_HEIGHT: f32 = 20.0; // % of screen height that max distance walls appear
 
 const WALL_MAX_ALPHA: u8 = 255;
 const WALL_MIN_ALPHA: u8 = 0;
@@ -22,8 +23,8 @@ pub fn draw_screen(state: &GameState) {
     let map = &state.map;
 
     // draw map from player's perspective
-    let half_fov = player.fov / 2.0;
-    let chunk_width = screen_width() / (player.fov * SCREEN_CHUNKS_PER_FOV_DEGREE);
+    let half_fov = PLAYER_FOV / 2.0;
+    let chunk_width = screen_width() / (PLAYER_FOV * SCREEN_CHUNKS_PER_FOV_DEGREE);
     let chunk_view_angle_increment = 1.0 / SCREEN_CHUNKS_PER_FOV_DEGREE;
     let mut curr_chunk = 1;
     let mut curr_chunk_view_angle = -half_fov;
