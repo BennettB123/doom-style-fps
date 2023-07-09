@@ -10,9 +10,9 @@ const MAX_VIEW_DISTANCE_WALL_HEIGHT: f32 = 20.0; // % of screen height that max 
 
 const WALL_MAX_ALPHA: u8 = 255;
 const WALL_MIN_ALPHA: u8 = 0;
-const WALL_R: u8 = 206;
-const WALL_G: u8 = 204;
-const WALL_B: u8 = 192;
+const WALL_R: u8 = 255;
+const WALL_G: u8 = 255;
+const WALL_B: u8 = 255;
 
 pub fn clear_screen() {
     clear_background(BACKGROUND_COLOR);
@@ -35,9 +35,12 @@ pub fn draw_screen(state: &GameState) {
         }
 
         let view_angle = player.direction + curr_chunk_view_angle;
-        let dist_to_wall = map.distance_to_wall(&player.location, view_angle);
-        let chunk_start_x: f32 = chunk_width * curr_chunk as f32;
-        draw_wall_chunk(chunk_start_x, chunk_start_x + chunk_width, dist_to_wall);
+        if let Some(dist_to_wall) =
+            map.distance_to_wall(&player.location, view_angle, MAX_VIEW_DISTANCE)
+        {
+            let chunk_start_x: f32 = chunk_width * curr_chunk as f32;
+            draw_wall_chunk(chunk_start_x, chunk_start_x + chunk_width, dist_to_wall);
+        }
 
         curr_chunk_view_angle += chunk_view_angle_increment;
         curr_chunk += 1;

@@ -1,9 +1,10 @@
 use super::Location;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone)]
 pub enum MapPiece {
     Nothing,
     Wall,
+    OutOfBounds,
 }
 
 #[derive(Debug)]
@@ -15,12 +16,15 @@ pub struct Map {
 impl Map {
     const DISTANCE_INCREMENT: f32 = 0.1;
 
-    pub fn distance_to_wall(&self, start_location: &Location, direction: f32) -> f32 {
+    pub fn distance_to_wall(&self, start: &Location, direction: f32, max_dist: f32) -> Option<f32> {
         let mut distance = 0.0;
-        let mut curr_location = *start_location;
+        let mut curr_location = *start;
 
         loop {
-            if self.is_wall(&curr_location) {
+            if distance >= max_dist {
+                return None;
+            }
+            if self.get_piece_at_location(&curr_location) == MapPiece::Wall {
                 break;
             }
 
@@ -28,13 +32,18 @@ impl Map {
             curr_location.x += Map::DISTANCE_INCREMENT * direction.to_radians().cos();
             curr_location.y += Map::DISTANCE_INCREMENT * direction.to_radians().sin();
         }
-        distance
+        Some(distance)
     }
 
-    pub fn is_wall(&self, location: &Location) -> bool {
-        match self.grid[location.x as usize][location.y as usize] {
-            MapPiece::Wall => true,
-            _ => false,
+    fn get_piece_at_location(&self, location: &Location) -> MapPiece {
+        // this logic doesn't work if the location is negative
+        //   this *shouldn't* cause issues since the player *shouldn't* be there...
+        match self.grid.get(location.y as usize) {
+            None => MapPiece::OutOfBounds,
+            Some(row) => match row.get(location.x as usize) {
+                None => MapPiece::OutOfBounds,
+                Some(piece) => *piece,
+            },
         }
     }
 }
