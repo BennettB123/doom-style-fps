@@ -26,7 +26,7 @@ pub fn draw_screen(state: &GameState) {
     let half_fov = PLAYER_FOV / 2.0;
     let chunk_width = screen_width() / (PLAYER_FOV * SCREEN_CHUNKS_PER_FOV_DEGREE);
     let chunk_view_angle_increment = 1.0 / SCREEN_CHUNKS_PER_FOV_DEGREE;
-    let mut curr_chunk = 1;
+    let mut curr_chunk = 0;
     let mut curr_chunk_view_angle = -half_fov;
 
     loop {
