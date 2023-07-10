@@ -54,13 +54,15 @@ impl Player {
 
         let new_x = self.location.x + d_time * Player::MOVE_SPEED * move_angle.to_radians().cos();
         let new_y = self.location.y + d_time * Player::MOVE_SPEED * move_angle.to_radians().sin();
-        let new_location = Location::new(new_x, new_y);
 
-        // ensure we aren't moving into a wall
-        // TODO: fix this so that you can diagonally move against walls
-        //   might require splitting this up into move_x and move_y
-        if map.get_piece_at_location(&new_location) == MapPiece::Nothing {
-            self.location = new_location;
+        // move along x-axis if possible
+        if map.get_piece_at_location(&Location::new(new_x, self.location.y)) != MapPiece::Wall {
+            self.location.x = new_x;
+        }
+
+        // move along y-axis if possible
+        if map.get_piece_at_location(&Location::new(self.location.x, new_y)) != MapPiece::Wall {
+            self.location.y = new_y;
         }
     }
 }

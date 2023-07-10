@@ -12,12 +12,4 @@ impl Location {
     pub fn new(x: f32, y: f32) -> Self {
         Location { x, y }
     }
-
-    pub fn set_x(&mut self, x: f32) {
-        self.x = x;
-    }
-
-    pub fn set_y(&mut self, y: f32) {
-        self.y = y;
-    }
 }

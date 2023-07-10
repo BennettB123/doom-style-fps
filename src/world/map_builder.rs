@@ -42,8 +42,8 @@ fn load_map_from_string(map_str: &str) -> Map {
         for (x, c) in line.chars().enumerate() {
             grid_line.push(map_char_to_map_entity(c));
             if c == 'P' {
-                player.set_x(x as f32);
-                player.set_y(y as f32);
+                player.x = x as f32;
+                player.y = y as f32;
             }
         }
         grid.push(grid_line);
