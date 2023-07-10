@@ -2,6 +2,7 @@ use super::Location;
 
 #[derive(Debug, PartialEq, Eq, Copy, Clone)]
 pub enum MapPiece {
+    // TODO: better name for this enum
     Nothing,
     Wall,
     OutOfBounds,
@@ -35,7 +36,7 @@ impl Map {
         Some(distance)
     }
 
-    fn get_piece_at_location(&self, location: &Location) -> MapPiece {
+    pub fn get_piece_at_location(&self, location: &Location) -> MapPiece {
         // this logic doesn't work if the location is negative
         //   this *shouldn't* cause issues since the player *shouldn't* be there...
         match self.grid.get(location.y as usize) {

@@ -49,16 +49,16 @@ fn capture_user_input(state: &mut GameState) {
         state.player.look_left();
     }
     if is_key_down(KeyCode::W) {
-        state.player.move_direction(&Direction::Forward);
+        state.player.move_direction(&Direction::Forward, &state.map);
     }
     if is_key_down(KeyCode::A) {
-        state.player.move_direction(&Direction::Left);
+        state.player.move_direction(&Direction::Left, &state.map);
     }
     if is_key_down(KeyCode::S) {
-        state.player.move_direction(&Direction::Back);
+        state.player.move_direction(&Direction::Back, &state.map);
     }
     if is_key_down(KeyCode::D) {
-        state.player.move_direction(&Direction::Right);
+        state.player.move_direction(&Direction::Right, &state.map);
     }
 }
 

@@ -20,12 +20,4 @@ impl Location {
     pub fn set_y(&mut self, y: f32) {
         self.y = y;
     }
-
-    pub fn move_x(&mut self, amt: f32) {
-        self.x += amt;
-    }
-
-    pub fn move_y(&mut self, amt: f32) {
-        self.y += amt;
-    }
 }
