@@ -5,8 +5,8 @@ use crate::GameState;
 const BACKGROUND_COLOR: Color = BLACK;
 const PLAYER_FOV: f32 = 90.0; // field of view in degrees
 const SCREEN_CHUNKS_PER_FOV_DEGREE: f32 = 2.0;
-const MAX_VIEW_DISTANCE: f32 = 15.0; // maximum distance at which objects are visible
-const MAX_VIEW_DISTANCE_WALL_HEIGHT: f32 = 20.0; // % of screen height that max distance walls appear
+const MAX_VIEW_DISTANCE: f32 = 20.0; // maximum distance at which objects are visible
+const ZOOM_FACTOR: f32 = 4.0; // control how "zoomed" the camera is
 
 const WALL_MAX_ALPHA: u8 = 255;
 const WALL_MIN_ALPHA: u8 = 0;
@@ -47,11 +47,10 @@ pub fn draw_screen(state: &GameState) {
     }
 }
 
-// TODO: fix this function
 fn draw_wall_chunk(start_x: f32, end_x: f32, dist_to_wall: f32) {
     let x = start_x;
     let w = end_x - start_x;
-    let h = 20.0 * (MAX_VIEW_DISTANCE_WALL_HEIGHT * MAX_VIEW_DISTANCE / dist_to_wall); // TODO
+    let h = ZOOM_FACTOR * (screen_height() / 2.0) / dist_to_wall;
     let y = (screen_height() / 2.0) - (h / 2.0);
     let alpha: u8 = map_range(
         dist_to_wall,

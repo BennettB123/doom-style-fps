@@ -31,8 +31,8 @@ pub fn get_window_configuration() -> Conf {
         window_title: GAME_NAME.to_owned(),
         high_dpi: true,
         fullscreen: false,
-        window_width: 2500,
-        window_height: 1500,
+        window_width: 1920,
+        window_height: 1080,
         ..Conf::default()
     }
 }
