@@ -15,7 +15,7 @@ pub struct Map {
 }
 
 impl Map {
-    const DISTANCE_INCREMENT: f32 = 0.1;
+    const DISTANCE_INCREMENT: f32 = 0.05;
 
     pub fn distance_to_wall(&self, start: &Location, direction: f32, max_dist: f32) -> Option<f32> {
         let mut distance = 0.0;

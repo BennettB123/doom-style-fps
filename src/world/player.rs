@@ -55,6 +55,8 @@ impl Player {
         let new_x = self.location.x + d_time * Player::MOVE_SPEED * move_angle.to_radians().cos();
         let new_y = self.location.y + d_time * Player::MOVE_SPEED * move_angle.to_radians().sin();
 
+        // TODO change logic so that player still moves as much as possible before entering wall?
+
         // move along x-axis if possible
         if map.get_piece_at_location(&Location::new(new_x, self.location.y)) != MapPiece::Wall {
             self.location.x = new_x;
