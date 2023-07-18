@@ -7,7 +7,7 @@ use world::map::Map;
 use world::map_builder;
 use world::player::{Direction, Player};
 
-const GAME_NAME: &str = "Doom Style FPS";
+const GAME_NAME: &str = "Raycasting Game Demo";
 
 #[macroquad::main(get_window_configuration())]
 async fn main() {
