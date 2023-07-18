@@ -1,6 +1,6 @@
 use macroquad::prelude::*;
 
-use crate::GameState;
+use crate::{GameState, SpriteTextures};
 
 const BACKGROUND_COLOR: Color = BLACK;
 const PLAYER_FOV: f32 = 90.0; // field of view in degrees
@@ -23,7 +23,7 @@ pub fn clear_screen() {
     clear_background(BACKGROUND_COLOR);
 }
 
-pub fn draw_screen(state: &GameState) {
+pub fn draw_screen(state: &GameState, sprites: &SpriteTextures) {
     let player = &state.player;
     let map = &state.map;
 
@@ -52,6 +52,8 @@ pub fn draw_screen(state: &GameState) {
         curr_chunk_view_angle += chunk_view_angle_increment;
         curr_chunk += 1;
     }
+
+    draw_zombies(state, &sprites.zombie);
 }
 
 fn draw_floor() {
@@ -129,6 +131,20 @@ fn draw_wall_chunk(start_x: f32, end_x: f32, dist_to_wall: f32) {
         wall_h,
         color_u8!(r, g, b, 255),
     );
+}
+
+fn draw_zombies(state: &GameState, sprite: &Texture2D) {
+    let player = &state.player;
+    let zombies = &state.zombies;
+    let screen_h = screen_height();
+    let screen_w = screen_width();
+
+    let x = 0.0;
+    let y = 0.0;
+
+    for (i, zomb) in zombies.iter().enumerate() {
+        draw_texture(*sprite, x, y, WHITE);
+    }
 }
 
 fn map_range(input: f32, from_range: (f32, f32), to_range: (f32, f32)) -> f32 {

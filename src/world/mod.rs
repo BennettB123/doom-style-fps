@@ -1,6 +1,7 @@
 pub mod map;
 pub mod map_builder;
 pub mod player;
+pub mod zombie;
 
 #[derive(Debug, Clone, Copy)]
 pub struct Location {

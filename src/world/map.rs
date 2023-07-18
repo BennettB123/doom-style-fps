@@ -1,4 +1,4 @@
-use super::Location;
+use crate::world::Location;
 
 #[derive(Debug, PartialEq, Eq, Copy, Clone)]
 pub enum MapPiece {
@@ -11,7 +11,6 @@ pub enum MapPiece {
 #[derive(Debug)]
 pub struct Map {
     pub grid: Vec<Vec<MapPiece>>,
-    pub player_start: Location,
 }
 
 impl Map {
